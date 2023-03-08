@@ -14,13 +14,14 @@ def print_file(str_, save_file_path=None):
 
 
 class Metrictor_PPI:
-    def __init__(self, pre_y, truth_y, is_binary=False):
+    def __init__(self, pre_y, truth_y, true_prob, is_binary=False):
         self.TP = 0
         self.FP = 0
         self.TN = 0
         self.FN = 0
         self.pre = np.array(pre_y).squeeze()
         self.tru = np.array(truth_y).squeeze()
+        self.true_prob = np.array(true_prob).squeeze()
         if is_binary:
             length = pre_y.shape[0]
             for i in range(length):
@@ -57,11 +58,11 @@ class Metrictor_PPI:
         self.F1 = 2 * self.Precision * self.Recall / (self.Precision + self.Recall + 1e-10)
         # fpr, tpr, thresholds = metrics.roc_curve(self.tru, self.pre, pos_label=1)
         # self.Auc = metrics.auc(fpr, tpr)
-        new_pre = self.pre
-        new_tru = self.tru
+        aupr_entry_1 = self.tru
+        aupr_entry_2 = self.true_prob
         aupr = np.zeros(7)
         for i in range(7):
-            precision, recall, _ = precision_recall_curve(new_pre[:,i], new_tru[:,i])
+            precision, recall, _ = precision_recall_curve(aupr_entry_1[:,i], aupr_entry_2[:,i])
             aupr[i] = auc(recall,precision)
         self.Aupr = aupr
 
@@ -71,7 +72,7 @@ class Metrictor_PPI:
             print_file("Recall: {}".format(self.Recall), file)
             print_file("F1-Score: {}".format(self.F1), file)
             # print_file("AUC: {}".format(self.Auc), file)
-            # print_file("Aupr: {}".format(self.Aupr), file)
+#             print_file("Aupr: {}".format(self.Aupr), file)
 
 
 class UnionFindSet(object):
