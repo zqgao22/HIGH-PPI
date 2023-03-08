@@ -149,7 +149,7 @@ def train(batch, p_x_all, p_edge_all, model, graph, ppi_list, loss_fn, optimizer
             m = nn.Sigmoid()
             pre_result = (m(output) > 0.5).type(torch.FloatTensor).to(device)
 
-            metrics = Metrictor_PPI(pre_result.cpu().data, label.cpu().data)
+            metrics = Metrictor_PPI(pre_result.cpu().data, label.cpu().data, m(output).cpu().data)
 
             metrics.show_result()
 
@@ -205,7 +205,7 @@ def train(batch, p_x_all, p_edge_all, model, graph, ppi_list, loss_fn, optimizer
         valid_label_list = torch.cat(valid_label_list, dim=0)
         true_prob_list = torch.cat(true_prob_list, dim = 0)
 
-        metrics = Metrictor_PPI(valid_pre_result_list, valid_label_list)
+        metrics = Metrictor_PPI(valid_pre_result_list, valid_label_list, true_prob_list)
 
         metrics.show_result()
 
