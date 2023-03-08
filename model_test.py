@@ -94,6 +94,7 @@ def test(model, graph, test_mask, device,batch, p_x_all, p_edge_all):
     
     valid_pre_result_list = []
     valid_label_list = []
+    true_prob_list = []
     for step in tqdm(range(valid_steps)):
         if step == valid_steps-1:
             valid_edge_id = test_mask[step*batch_size:]
@@ -110,15 +111,17 @@ def test(model, graph, test_mask, device,batch, p_x_all, p_edge_all):
 
         valid_pre_result_list.append(pre_result.cpu().data)
         valid_label_list.append(label.cpu().data)
+        true_prob_list.append(m(output).cpu().data)
 
     valid_pre_result_list = torch.cat(valid_pre_result_list, dim=0)
     valid_label_list = torch.cat(valid_label_list, dim=0)
-    metrics = Metrictor_PPI(valid_pre_result_list, valid_label_list)
+    true_prob_list = torch.cat(true_prob_list, dim = 0)
+    metrics = Metrictor_PPI(valid_pre_result_list, valid_label_list, true_prob_list)
 
     metrics.show_result()
 
-    print_file("F1: {}".format(metrics.F1))
-    print_file("aupr: {}".format(metrics.Aupr))
+    print('recall: {}, precision: {}, F1: {}, AUPRC: {}'.format(metrics.Recall, metrics.Precision, \
+        metrics.F1, metrics.Aupr))
     print(valid_pre_result_list)
     print(valid_label_list)
 
